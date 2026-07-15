@@ -23,42 +23,33 @@ function BrandCard({ name, index, inView }: { name: string; index: number; inVie
 
 export default function BrandStrip() {
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true });
+  const inView = useInView(ref, { once: true, margin: "-50px" });
 
   return (
-    <section className="py-8 sm:py-12 border-b border-charcoal-light overflow-hidden">
-      <motion.div initial={{ opacity: 0 }} animate={inView ? { opacity: 1 } : {}} transition={{ duration: 0.8 }}>
-        <p className="text-center text-xs uppercase tracking-[0.3em] text-muted/60 mb-6 sm:mb-8">
-          Trusted brands we partner with
-        </p>
+    <section ref={ref} className="py-8 sm:py-12 border-b border-charcoal-light">
+      <p className="text-center text-xs uppercase tracking-[0.3em] text-muted/60 mb-6 sm:mb-8">
+        Trusted brands we partner with
+      </p>
 
-        {/* Logo grid */}
-        <div className="max-w-5xl mx-auto px-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-          {brands.map((brand, i) => (
-            <BrandCard key={brand} name={brand} index={i} inView={inView} />
-          ))}
-        </div>
+      <div className="max-w-5xl mx-auto px-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+        {brands.map((brand, i) => (
+          <BrandCard key={brand} name={brand} index={i} inView={inView} />
+        ))}
+      </div>
 
-        {/* Certification badges */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5, delay: 0.6 }}
-          className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-6 pt-6 border-t border-charcoal-light/50 max-w-3xl mx-auto"
-        >
-          {[
-            { label: "Tier 1 Panels", Icon: Shield },
-            { label: "EPBA Member", Icon: Zap },
-            { label: "ISO 9001", Icon: Award },
-            { label: "NEMA Approved", Icon: Leaf },
-          ].map((cert) => (
-            <div key={cert.label} className="flex items-center gap-2 text-muted/60">
-              <cert.Icon size={14} />
-              <span className="text-[10px] sm:text-xs uppercase tracking-wider font-medium">{cert.label}</span>
-            </div>
-          ))}
-        </motion.div>
-      </motion.div>
+      <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-6 pt-6 border-t border-charcoal-light/50 max-w-3xl mx-auto">
+        {[
+          { label: "Tier 1 Panels", Icon: Shield },
+          { label: "EPBA Member", Icon: Zap },
+          { label: "ISO 9001", Icon: Award },
+          { label: "NEMA Approved", Icon: Leaf },
+        ].map((cert) => (
+          <div key={cert.label} className="flex items-center gap-2 text-muted/60">
+            <cert.Icon size={14} />
+            <span className="text-[10px] sm:text-xs uppercase tracking-wider font-medium">{cert.label}</span>
+          </div>
+        ))}
+      </div>
     </section>
   );
 }
