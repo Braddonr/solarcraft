@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, X, Minus, Plus, Trash2, User, Mail, Phone, MapPin, FileText, Send, PartyPopper, ArrowRight, PhoneCall, Truck } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { validateName, validateEmail, validatePhone, validateCheckout } from "@/utils/validation";
 
 const ORDER_EMAIL = "braddonr@gmail.com";
 
@@ -17,9 +18,31 @@ export default function CartDrawer() {
   const [note, setNote] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  const handleBlur = (field: string) => {
+    setTouched((t) => ({ ...t, [field]: true }));
+    const validators: Record<string, () => string | null> = {
+      name: () => validateName(name),
+      email: () => validateEmail(email),
+      phone: () => validatePhone(phone, true),
+    };
+    const err = validators[field]?.();
+    setFieldErrors((prev) => {
+      const next = { ...prev };
+      if (err) next[field] = err; else delete next[field];
+      return next;
+    });
+  };
 
   const handleSubmit = async () => {
-    if (!name || !email || !phone) return;
+    const errors = validateCheckout({ name, email, phone });
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setTouched({ name: true, email: true, phone: true });
+      return;
+    }
     setSending(true);
     setError("");
 
@@ -80,7 +103,7 @@ export default function CartDrawer() {
 
   const resetAndClose = () => {
     setView("cart");
-    setName(""); setEmail(""); setPhone(""); setLocation(""); setNote(""); setError("");
+    setName(""); setEmail(""); setPhone(""); setLocation(""); setNote(""); setError(""); setFieldErrors({}); setTouched({});
     closeCart();
   };
 
@@ -88,7 +111,7 @@ export default function CartDrawer() {
     <AnimatePresence>
       {isOpen && (
         <>
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={resetAndClose} className="fixed inset-0 bg-black/40 z-[60] backdrop-blur-sm" />
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={resetAndClose} className="fixed inset-0 bg-overlay z-[60] backdrop-blur-sm" />
           <div className="fixed top-0 right-0 bottom-0 w-full max-w-md bg-background border-l border-charcoal-light z-[70] flex flex-col cart-drawer">
             
             {/* Header */}
@@ -195,33 +218,36 @@ export default function CartDrawer() {
                       <label className="text-xs font-medium text-muted mb-1 block">Full name *</label>
                       <div className="relative">
                         <User size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted/40" />
-                        <input type="text" placeholder="e.g. Jane Wanjiku" value={name} onChange={(e) => setName(e.target.value)} className="w-full pl-10 pr-4 py-3 rounded-xl bg-card border border-charcoal-light text-foreground placeholder:text-muted/40 focus:outline-none focus:border-amber/50 text-sm" />
+                        <input type="text" placeholder="e.g. Jane Wanjiku" value={name} onChange={(e) => { setName(e.target.value); if (touched.name) { const err = validateName(e.target.value); setFieldErrors((p) => { const n = {...p}; if (err) n.name = err; else delete n.name; return n; }); } }} onBlur={() => handleBlur("name")} className={`w-full pl-10 pr-4 py-3 rounded-xl bg-card border ${touched.name && fieldErrors.name ? 'border-red-500' : 'border-charcoal-light'} text-foreground placeholder:text-muted/40 focus:outline-none focus:border-amber/50 text-base sm:text-sm`} />
                       </div>
+                      {touched.name && fieldErrors.name && <p className="text-xs text-red-500 mt-1 ml-1">{fieldErrors.name}</p>}
                     </div>
                     <div>
                       <label className="text-xs font-medium text-muted mb-1 block">Email address *</label>
                       <div className="relative">
                         <Mail size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted/40" />
-                        <input type="email" placeholder="e.g. jane@example.com" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full pl-10 pr-4 py-3 rounded-xl bg-card border border-charcoal-light text-foreground placeholder:text-muted/40 focus:outline-none focus:border-amber/50 text-sm" />
+                        <input type="email" placeholder="e.g. jane@example.com" value={email} onChange={(e) => { setEmail(e.target.value); if (touched.email) { const err = validateEmail(e.target.value); setFieldErrors((p) => { const n = {...p}; if (err) n.email = err; else delete n.email; return n; }); } }} onBlur={() => handleBlur("email")} className={`w-full pl-10 pr-4 py-3 rounded-xl bg-card border ${touched.email && fieldErrors.email ? 'border-red-500' : 'border-charcoal-light'} text-foreground placeholder:text-muted/40 focus:outline-none focus:border-amber/50 text-base sm:text-sm`} />
                       </div>
+                      {touched.email && fieldErrors.email && <p className="text-xs text-red-500 mt-1 ml-1">{fieldErrors.email}</p>}
                     </div>
                     <div>
                       <label className="text-xs font-medium text-muted mb-1 block">Phone number *</label>
                       <div className="relative">
                         <Phone size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted/40" />
-                        <input type="tel" placeholder="e.g. 0712 345 678" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full pl-10 pr-4 py-3 rounded-xl bg-card border border-charcoal-light text-foreground placeholder:text-muted/40 focus:outline-none focus:border-amber/50 text-sm" />
+                        <input type="tel" placeholder="e.g. 0712 345 678" value={phone} onChange={(e) => { setPhone(e.target.value); if (touched.phone) { const err = validatePhone(e.target.value, true); setFieldErrors((p) => { const n = {...p}; if (err) n.phone = err; else delete n.phone; return n; }); } }} onBlur={() => handleBlur("phone")} className={`w-full pl-10 pr-4 py-3 rounded-xl bg-card border ${touched.phone && fieldErrors.phone ? 'border-red-500' : 'border-charcoal-light'} text-foreground placeholder:text-muted/40 focus:outline-none focus:border-amber/50 text-base sm:text-sm`} />
                       </div>
+                      {touched.phone && fieldErrors.phone && <p className="text-xs text-red-500 mt-1 ml-1">{fieldErrors.phone}</p>}
                     </div>
                     <div>
                       <label className="text-xs font-medium text-muted mb-1 block">Delivery location</label>
                       <div className="relative">
                         <MapPin size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted/40" />
-                        <input type="text" placeholder="e.g. Kilimani, Nairobi" value={location} onChange={(e) => setLocation(e.target.value)} className="w-full pl-10 pr-4 py-3 rounded-xl bg-card border border-charcoal-light text-foreground placeholder:text-muted/40 focus:outline-none focus:border-amber/50 text-sm" />
+                        <input type="text" placeholder="e.g. Kilimani, Nairobi" value={location} onChange={(e) => setLocation(e.target.value)} className="w-full pl-10 pr-4 py-3 rounded-xl bg-card border border-charcoal-light text-foreground placeholder:text-muted/40 focus:outline-none focus:border-amber/50 text-base sm:text-sm" />
                       </div>
                     </div>
                     <div>
                       <label className="text-xs font-medium text-muted mb-1 block">Additional notes</label>
-                      <textarea rows={2} placeholder="Installation needs, preferred delivery date..." value={note} onChange={(e) => setNote(e.target.value)} className="w-full px-4 py-3 rounded-xl bg-card border border-charcoal-light text-foreground placeholder:text-muted/40 focus:outline-none focus:border-amber/50 text-sm resize-none" />
+                      <textarea rows={2} placeholder="Installation needs, preferred delivery date..." value={note} onChange={(e) => setNote(e.target.value)} className="w-full px-4 py-3 rounded-xl bg-card border border-charcoal-light text-foreground placeholder:text-muted/40 focus:outline-none focus:border-amber/50 text-base sm:text-sm resize-none" />
                     </div>
                     {error && (
                       <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-xs text-red-500 bg-red-500/10 px-3 py-2 rounded-lg">{error}</motion.p>
@@ -300,7 +326,7 @@ export default function CartDrawer() {
                   <motion.button
                     whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}
                     onClick={handleSubmit}
-                    disabled={!name || !email || !phone || sending}
+                    disabled={sending || Object.keys(validateCheckout({ name, email, phone })).length > 0}
                     className="w-full py-3 rounded-full bg-amber text-background font-medium hover:bg-amber-light transition-colors text-sm disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {sending ? (

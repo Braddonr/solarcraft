@@ -26,7 +26,7 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
       animate={inView ? { opacity: 1, y: 0 } : {}}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.5, delay: Math.min(index * 0.08, 0.4), ease: [0.22, 1, 0.36, 1] }}
-      className="group relative rounded-2xl border border-charcoal-light bg-card overflow-hidden hover:shadow-lg hover:shadow-amber/5 transition-all duration-500"
+      className="group relative rounded-2xl border border-charcoal-light bg-card overflow-hidden hover:shadow-lg hover:shadow-[var(--color-shadow-amber)] transition-all duration-500"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-charcoal">
         <img src={product.image} alt={product.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />

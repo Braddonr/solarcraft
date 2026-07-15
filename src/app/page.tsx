@@ -1,4 +1,5 @@
 import Navbar from "@/components/Navbar";
+import DarkModeBanner from "@/components/DarkModeBanner";
 import CartDrawer from "@/components/CartDrawer";
 import Hero from "@/components/Hero";
 import BrandStrip from "@/components/BrandStrip";
@@ -12,6 +13,7 @@ export default function Home() {
   return (
     <>
       <Navbar />
+      <DarkModeBanner />
       <CartDrawer />
       <main>
         <Hero />

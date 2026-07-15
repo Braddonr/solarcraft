@@ -28,7 +28,7 @@ export default function CustomSelect({ options, value, onChange, placeholder }: 
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className={`w-full flex items-center justify-between px-4 sm:px-5 py-3 rounded-xl bg-background border text-left transition-colors text-sm ${
+        className={`w-full flex items-center justify-between px-4 sm:px-5 py-3 rounded-xl bg-background border text-left transition-colors text-base sm:text-sm ${
           open || value ? "border-amber/50 text-foreground" : "border-charcoal-light text-muted"
         }`}
       >
@@ -52,7 +52,7 @@ export default function CustomSelect({ options, value, onChange, placeholder }: 
                 key={option}
                 type="button"
                 onClick={() => { onChange(option); setOpen(false); }}
-                className={`w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors ${
+                className={`w-full flex items-center justify-between px-4 py-2.5 text-base sm:text-sm transition-colors ${
                   value === option
                     ? "bg-amber/10 text-amber font-medium"
                     : "text-foreground hover:bg-charcoal"
