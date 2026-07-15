@@ -80,9 +80,9 @@ export default function Products() {
   const filtered = activeCategory === "All" ? products : products.filter((p) => p.category === activeCategory);
 
   return (
-    <section id="products" className="py-16 sm:py-24 lg:py-32">
+    <section id="products" className="py-12 sm:py-16 lg:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div ref={headerRef} initial={{ opacity: 0, y: 20 }} animate={headerInView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6 }} className="mb-10 sm:mb-16">
+        <motion.div ref={headerRef} initial={{ opacity: 0, y: 20 }} animate={headerInView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6 }} className="mb-8 sm:mb-12">
           <span className="text-sm uppercase tracking-widest text-amber mb-3 block">Our Catalogue</span>
           <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl tracking-tight italic">
             Solar products,
