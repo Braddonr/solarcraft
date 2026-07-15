@@ -6,7 +6,7 @@ import { heroContent, stats } from "@/data/site-data";
 
 export default function Hero() {
   return (
-    <section className="relative min-h-[90vh] sm:min-h-screen flex items-center overflow-hidden pt-28 sm:pt-[88px]">
+    <section className="relative min-h-[90vh] sm:min-h-screen flex items-center overflow-hidden pt-16 sm:pt-18">
       {/* Background effects */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(196,127,23,0.06)_0%,_transparent_60%)]" />
       <div className="absolute inset-0 opacity-[0.02]" style={{

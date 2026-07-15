@@ -1,36 +1,50 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sun, X, Zap } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 
 export default function DarkModeBanner() {
   const { theme } = useTheme();
-  const [dismissed, setDismissed] = useState(false);
+  const [visible, setVisible] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const prevThemeRef = useRef(theme);
 
   useEffect(() => setMounted(true), []);
 
-  if (!mounted || dismissed) return null;
+  // Auto-dismiss after 6 seconds
+  useEffect(() => {
+    timerRef.current = setTimeout(() => setVisible(false), 6000);
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, []);
+
+  // Reappear on theme switch
+  useEffect(() => {
+    if (prevThemeRef.current !== theme) {
+      prevThemeRef.current = theme;
+      if (timerRef.current) clearTimeout(timerRef.current);
+      setVisible(true);
+      timerRef.current = setTimeout(() => setVisible(false), 6000);
+    }
+  }, [theme]);
+
+  if (!mounted) return null;
 
   const isDark = theme === "dark";
 
   return (
     <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
-        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-        className="fixed top-16 sm:top-18 left-0 right-0 z-40"
-      >
-        <div className={`relative px-4 py-2.5 text-center transition-colors duration-500 ${
-          isDark
-            ? "bg-amber/10 border-b border-amber/20"
-            : "bg-amber/5 border-b border-charcoal-light"
-        }`}>
-          <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 sm:gap-3">
+      {visible && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          className="relative z-50 bg-background/80 backdrop-blur-xl border-b border-charcoal-light overflow-hidden"
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-center gap-2 sm:gap-3 text-center">
             {isDark ? (
               <>
                 <Zap size={14} className="text-amber shrink-0 hidden sm:block" />
@@ -57,14 +71,14 @@ export default function DarkModeBanner() {
             )}
           </div>
           <button
-            onClick={() => setDismissed(true)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full hover:bg-charcoal flex items-center justify-center transition-colors"
+            onClick={() => setVisible(false)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full hover:bg-charcoal flex items-center justify-center transition-colors"
             aria-label="Dismiss"
           >
             <X size={12} className="text-muted" />
           </button>
-        </div>
-      </motion.div>
+        </motion.div>
+      )}
     </AnimatePresence>
   );
 }
