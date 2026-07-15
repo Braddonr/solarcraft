@@ -1,26 +1,76 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* Class-based dark mode for Tailwind v4 */
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: #FAFAF7;
+  --color-foreground: #1A1918;
+  --color-cream: #FAFAF7;
+  --color-amber: #C47F17;
+  --color-amber-light: #D4913B;
+  --color-sage: #5B7A52;
+  --color-charcoal: #F0EFEB;
+  --color-charcoal-light: #E5E3DD;
+  --color-muted: #6B6560;
+  --color-card: #FFFFFF;
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Dark mode color overrides via CSS custom properties */
+:root.dark {
+  --color-background: #0C0B0A;
+  --color-foreground: #F5EDE0;
+  --color-cream: #F5EDE0;
+  --color-amber: #D4913B;
+  --color-amber-light: #E8A74A;
+  --color-sage: #7A8B6F;
+  --color-charcoal: #1A1918;
+  --color-charcoal-light: #2A2826;
+  --color-muted: #8A8580;
+  --color-card: #1A1918;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
 }
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--color-background); }
+::-webkit-scrollbar-thumb { background: var(--color-charcoal-light); border-radius: 3px; }
+
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.015;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+html { scroll-behavior: smooth; }
+
+::selection {
+  background: rgba(196, 127, 23, 0.2);
+  color: var(--color-foreground);
+}
+
+.font-display {
+  font-family: var(--font-serif), Georgia, serif;
+}
+
+.cart-overlay { animation: fadeIn 0.2s ease-out; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.cart-drawer { animation: slideIn 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+@keyframes badgeBounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+}
+.badge-bounce { animation: badgeBounce 0.3s ease; }
